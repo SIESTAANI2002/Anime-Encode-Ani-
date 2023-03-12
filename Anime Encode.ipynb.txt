@@ -1,0 +1,315 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Ani Encode.ipynb",
+      "provenance": [],
+      "machine_shape": "hm"
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "gpuClass": "standard"
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "source": [
+        "#@title <Center>Mount Google Drive </Center>\n",
+        "#@markdown <Center> <img src=\"https://kstatic.googleusercontent.com/files/e20dbc1db7b6eab22fb2d07df8043f8a74b301dbb8c176e6a1992b2dc229c5ae94b5c260cf549c41712fa40b7e639166c6a8461303a27c2a3b9c55b8ca155ec3\" class=\"icon\" alt=\"Icon\">\n",
+        "#@markdown <h6> Made In Ani Animesh </h6>\n",
+        "from google.colab import drive\n",
+        "drive.mount('/content/drive')"
+      ],
+      "metadata": {
+        "cellView": "form",
+        "id": "ljnsOZ-x8wDf"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#@title <font size=\"5\">← ឵឵<i>Install FFmpeg v4.2.2</font> { vertical-output: true }\n",
+        "from IPython.display import clear_output\n",
+        "import os, urllib.request\n",
+        "HOME = os.path.expanduser(\"~\")\n",
+        "pathDoneCMD = f'{HOME}/doneCMD.sh'\n",
+        "if not os.path.exists(f\"{HOME}/.ipython/ttmg.py\"):\n",
+        "    hCode = \"https://raw.githubusercontent.com/yunooooo/gcct/master/res/ttmg.py\"\n",
+        "    urllib.request.urlretrieve(hCode, f\"{HOME}/.ipython/ttmg.py\")\n",
+        "\n",
+        "from ttmg import (\n",
+        "    loadingAn,\n",
+        "    textAn,\n",
+        ")\n",
+        "\n",
+        "loadingAn(name=\"lds\")\n",
+        "textAn(\"Installing Dependencies...\", ty='twg')\n",
+        "os.system('pip install git+git://github.com/AWConant/jikanpy.git')\n",
+        "os.system('add-apt-repository -y ppa:jonathonf/ffmpeg-4')\n",
+        "os.system('apt-get update')\n",
+        "os.system('apt install mediainfo')\n",
+        "os.system('apt-get install ffmpeg')\n",
+        "clear_output()\n",
+        "print('Installation finished.')"
+      ],
+      "metadata": {
+        "cellView": "form",
+        "id": "m73gYkM-84Yq"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#@title <font size=\"5\">← ឵឵<i>Upgrade FFmpeg to v5.0</font> { vertical-output: true }\n",
+        "import os, uuid, re, IPython\n",
+        "import ipywidgets as widgets\n",
+        "import time\n",
+        "\n",
+        "from glob import glob\n",
+        "from google.colab import output, drive\n",
+        "\n",
+        "from IPython.display import clear_output\n",
+        "import os, sys, urllib.request\n",
+        "HOME = os.path.expanduser(\"~\")\n",
+        "pathDoneCMD = f'{HOME}/doneCMD.sh'\n",
+        "if not os.path.exists(f\"{HOME}/.ipython/ttmg.py\"):\n",
+        "    hCode = \"https://raw.githubusercontent.com/yunooooo/gcct/master/res/ttmg.py\"\n",
+        "    urllib.request.urlretrieve(hCode, f\"{HOME}/.ipython/ttmg.py\")\n",
+        "\n",
+        "from ttmg import (\n",
+        "    loadingAn,\n",
+        "    textAn,\n",
+        ")\n",
+        "\n",
+        "loadingAn(name=\"lds\")\n",
+        "textAn(\"Cloning Repositories...\", ty='twg')\n",
+        "!git clone https://github.com/XniceCraft/ffmpeg-colab.git\n",
+        "!chmod 755 ./ffmpeg-colab/install\n",
+        "textAn(\"Installing FFmpeg...\", ty='twg')\n",
+        "!./ffmpeg-colab/install\n",
+        "clear_output()\n",
+        "print('Installation finished!')\n",
+        "!rm -fr /content/ffmpeg-colab\n",
+        "!ffmpeg -version"
+      ],
+      "metadata": {
+        "cellView": "form",
+        "id": "ctFRCubT9wQe"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#@markdown <h3><b>FFMPEG Encode SVTAV1 10bit :</h3>\n",
+        "\n",
+        "import os, sys, re\n",
+        "\n",
+        "input_folder= '' #@param {type:\"string\"}\n",
+        "output_folder= '' #@param {type:\"string\"}\n",
+        "#@markdown <h3><b>Choose your encode setting :</h5>\n",
+        "#@markdown <h><i>main = default | main10 = HEVC 10 Bit</i>\n",
+        "encode_setting = \"AV1 AAC 10bit\" #@param [\"AV1 AAC 10bit\"]\n",
+        "output_file_type = 'mkv' #@param [\"mkv\", \"mp4\"]\n",
+        "#@markdown <h3><b>Video quality :</h3>\n",
+        "#@markdown <h><i>0 (Best) to 51 (Worst)</i><h>\n",
+        "resolution = '1280:720' #@param [\"1024:575\", \"1280:720\", \"1920:1080\"]\n",
+        "set_preset ='8'#@param {type:\"string\"}\n",
+        "set_crf ='28'#@param {type:\"string\"}\n",
+        "set_audio ='0:1' #@param {type:\"string\"}\n",
+        "\n",
+        "set_audio1 ='0:2' #@param {type:\"string\"}\n",
+        "my_suffixes = (\".mp4\", \".mov\", \".mkv\", \".avi\", \".ts\", \".flv\", \".webm\", \".wmv\", \".mpg\", \".m4v\", \".f4v\", \".m2ts\", \".mpeg\", \".3gp\", \".MP4\", \".MOV\", \".MKV\", \".AVI\", \".TS\", \".FLV\", \".WEBM\", \".WMV\", \".MPG\", \".M4V\", \".F4V\", \".M2TS\", \".MPEG\", \".3GP\")\n",
+        "\n",
+        "from pathlib import Path\n",
+        "Path(output_folder).mkdir(parents=True, exist_ok=True)\n",
+        "\n",
+        "if encode_setting == 'AV1 AAC 10bit':\n",
+        " for filename in os.listdir(input_folder):\n",
+        "     if (filename.endswith(my_suffixes)):\n",
+        "             cmd = !ffmpeg -i \"$input_folder/{filename}\" -metadata comment=\"SvtAv1-CRF$set_crf-AAC\" -c:v libsvtav1 -preset $set_preset -g 240 -s $resolution -pix_fmt yuv420p10le -color_primaries 1 -color_range 1 -color_trc 1 -colorspace 1 -svtav1-params \"tune=1:pass=0:film-grain=0:keyint=240:profile=0:lp=4:enable-hdr=1\" -vf \"drawtext=fontfile=/content/drive/MyDrive/Font/A.ttf:text=Encoded By @Ani_Animesh:x=1580:y=980:fontsize=25:fontcolor=white:enable=between(t\\,0\\,300)\",\"drawtext=fontfile=/content/drive/MyDrive/Font/cream-DEMO.ttf:text=www.AnimeSakura.co:fontsize=20:fontcolor=white:x=1580:y=970:enable=between(t\\,720\\,750)\" -crf $set_crf -map 0:v -map $set_audio -map $set_audio1 -map 0:s -c:a aac -b:a 96k -metadata title=\"Encoded By Ani Animesh\" -metadata:s:0 title=\"Presented By Anime Sakura\" -metadata:s:a:0 title=\"Ani Animesh\" -metadata:s:a:1 title=\"AnimeSakura.co\" -metadata:s:s:0 title=\"AnimeaSakura.co\" -metadata:s:s:1 title=\"@Ani_Animesh\"  \"$output_folder/{filename.rpartition('.')[0]}.$output_file_type\"\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "cellView": "form",
+        "id": "DJqVKomyL2M4"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#@markdown <h3><b>FFMPEG Encode x265 10bit :</h3>\n",
+        "\n",
+        "import os, sys, re\n",
+        "\n",
+        "input_folder= '' #@param {type:\"string\"}\n",
+        "output_folder= '' #@param {type:\"string\"}\n",
+        "#@markdown <h3><b>Choose your encode setting :</h5>\n",
+        "#@markdown <h><i>main = default | main10 = HEVC 10 Bit</i>\n",
+        "encode_setting = \"X265 AAC 720p\" #@param [\"X265 AAC 720p\", \"X265 AAC 540p\", \"X265 Copy\", \"X265 AAC 1080p\", \"X265 AAC 480p\"]\n",
+        "output_file_type = 'mkv' #@param [\"mkv\", \"mp4\"]\n",
+        "#@markdown <h3><b>Video quality :</h3>\n",
+        "#@markdown <h><i>0 (Best) to 51 (Worst)</i><h>\n",
+        "set_crf ='22.2'#@param {type:\"string\"}\n",
+        "set_audio ='0:1' #@param {type:\"string\"}\n",
+        "set_audio1 ='0:2' #@param {type:\"string\"}\n",
+        "my_suffixes = (\".mp4\", \".mov\", \".mkv\", \".avi\", \".ts\", \".flv\", \".webm\", \".wmv\", \".mpg\", \".m4v\", \".f4v\", \".m2ts\", \".mpeg\", \".3gp\", \".MP4\", \".MOV\", \".MKV\", \".AVI\", \".TS\", \".FLV\", \".WEBM\", \".WMV\", \".MPG\", \".M4V\", \".F4V\", \".M2TS\", \".MPEG\", \".3GP\")\n",
+        "\n",
+        "from pathlib import Path\n",
+        "Path(output_folder).mkdir(parents=True, exist_ok=True)\n",
+        "\n",
+        "if encode_setting == 'X265 AAC 720p':\n",
+        " for filename in os.listdir(input_folder):\n",
+        "     if (filename.endswith(my_suffixes)):\n",
+        "             cmd = !ffmpeg -stats  -i \"$input_folder/{filename}\" -metadata comment=\"X265-CRF$set_crf-AAC\" -c:v libx265 -color_primaries 1 -color_range 1 -color_trc 1 -colorspace 1 -profile:v main10 -pix_fmt yuv420p10le -vf scale=1280:720:spline16+accurate_rnd+full_chroma_int,\"drawtext=fontfile=/content/drive/MyDrive/Font/A.ttf:text=Encoded By @Ani_Animesh:x=1040:y=650:fontsize=20:fontcolor=white:enable=between(t\\,220\\,402)\",\"drawtext=fontfile=/content/drive/MyDrive/Font/cream-DEMO.ttf:text=www.AnimeSakura.co:fontsize=20:fontcolor=white:x=1040:y=650:enable=between(t\\,720\\,750)\" -preset medium -x265-params frame-threads=4:log-level=2:input-csp=1:input-res=1280x720:high-tier=1:ref=6:min-keyint=23:keyint=250:bframes=6:b-adapt=2:rc-lookahead=80:lookahead-slices=6:scenecut=40:ctu=64:min-cu-size=8:max-tu-size=32:tu-inter-depth=4:tu-intra-depth=4:limit-tu=1:rdoq-level=2:max-merge=4:limit-refs=3:me=3:subme=4:merange=48:deblock=1,1:rd=4:psy-rd=0.80:psy-rdoq=1.25:ipratio=1.40:pbratio=1.30:aq-mode=3:aq-strength=0.75:cbqpoffs=-1:crqpoffs=-1:qcomp=0.60:qpstep=4:qg-size=32:qpmax=69:qpmin=0:sar=1:videoformat=5:range=0:colorprim=2:transfer=2:colormatrix=2:chromaloc=1:slices=1:no-info=1:limit-sao=1 -crf $set_crf -map 0:0 -map $set_audio -map $set_audio1 -map 0:s -c:a aac -b:a 128k -metadata title=\"Encoded By Ani Animesh\" -metadata:s:0 title=\"Presented By Anime Sakura\" -metadata:s:a:0 title=\"Ani Animesh\" -metadata:s:a:1 title=\"AnimeSakura.co\" -metadata:s:s:0 title=\"AnimeSakura.co\" -metadata:s:s:1 title=\"@Ani_Animesh\"  \"$output_folder/{filename.rpartition('.')[0]}.$output_file_type\"\n",
+        "if encode_setting == 'X265 AAC 540p':\n",
+        " for filename in os.listdir(input_folder):\n",
+        "     if (filename.endswith(my_suffixes)):\n",
+        "             cmd = !ffmpeg -stats -i \"$input_folder/{filename}\" -metadata comment=\"X265-CRF$set_crf-AAC\" -c:v libx265 -color_primaries 1 -color_range 1 -color_trc 1 -colorspace 1 -profile:v main10 -pix_fmt yuv420p10le -preset medium -vf smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0,scale=960:540:spline16+accurate_rnd+full_chroma_int -x265-params me=2:rd=4:subme=7:aq-mode=3:aq-strength=1:deblock=1,1:psy-rd=1:psy-rdoq=1:rdoq-level=2:merange=57:bframes=8:b-adapt=2:limit-sao=1:frame-threads=3:no-info=1 -crf $set_crf -map 0:0 -map $set_audio -map $set_audio1 -map 0:s -c:a aac -b:a 128k -metadata title=\"Encoded By Ani Animesh\" -metadata:s:0 title=\"Presented By Sakura Anime\" -metadata:s:a:0 title=\"Ani Animesh\" -metadata:s:a:1 title=\"AnimeSakura.co\" -metadata:s:s:0 title=\"AnimeSakura.co\" -metadata:s:s:1 title=\"@Animesh20\" -metadata:s:s:2 title=\"@AnimeChannelSakura\"  \"$output_folder/{filename.rpartition('.')[0]}.$output_file_type\"\n",
+        "if encode_setting == 'X265 Copy':\n",
+        " for filename in os.listdir(input_folder):\n",
+        "     if (filename.endswith(my_suffixes)):\n",
+        "             cmd = !ffmpeg -stats -i \"$input_folder/{filename}\" -metadata comment=\"X265-CRF$set_crf-AAC\" -metadata title=\"Encoded By Ani Animesh\" -metadata:s:0 title=\"Presented By Anime Sakura\" -metadata:s:a:0 title=\"Ani Animesh\" -metadata:s:a:1 title=\"AnimeSakura.Co\" -metadata:s:s:0 title=\"AnimeSakura.co\" -metadata:s:s:1 title=\"@Ani_Animesh\" -metadata:s:s:2 title=\"AnimeSakura.co\" -map 0 -codec copy \"$output_folder/{filename.rpartition('.')[0]}.$output_file_type\"\n",
+        "if encode_setting == 'X265 AAC 1080p':\n",
+        " for filename in os.listdir(input_folder):\n",
+        "     if (filename.endswith(my_suffixes)):\n",
+        "             cmd = !ffmpeg -stats -i \"$input_folder/{filename}\" -metadata comment=\"X265-CRF$set_crf-AAC\" -c:v libx265 -color_primaries 1 -color_range 1 -color_trc 1 -colorspace 1 -profile:v main10 -pix_fmt yuv420p10le -preset medium -vf smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0,scale=1920:1080:spline16+accurate_rnd+full_chroma_int -crf $set_crf -map 0:0 -map $set_audio -map $set_audio1 -map 0:s -c:a aac -b:a 192k -metadata title=\"Encoded By Ani Animesh\" -metadata:s:0 title=\"Presented By Sakura Anime\" -metadata:s:a:0 title=\"Ani Animesh\" -metadata:s:a:1 title=\"Sakura Anime\" -metadata:s:s:0 title=\"Sakura Anime\" -metadata:s:s:1 title=\"@Animesh20\" -metadata:s:s:2 title=\"@AnimeChannelSakura\" \"$output_folder/{filename.rpartition('.')[0]}.$output_file_type\"\n",
+        "if encode_setting == 'X265 AAC 480p':\n",
+        "  for filename in os.listdir(input_folder):\n",
+        "      if (filename.endswith(my_suffixes)):\n",
+        "            cmd = !ffmpeg -stats -i \"$input_folder/{filename}\" -metadata comment=\"X265-CRF$set_crf-AAC\" -c:v libx265 -color_primaries 1 -color_range 1 -color_trc 1 -colorspace 1 -profile:v main10 -pix_fmt yuv420p10le -vf smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0,scale=854:480:spline16+accurate_rnd+full_chroma_int -preset medium  -x265-params me=2:rd=4:subme=7:aq-mode=3:aq-strength=1:deblock=1,1:psy-rd=1:psy-rdoq=1:rdoq-level=2:merange=57:bframes=8:b-adapt=2:limit-sao=1:frame-threads=3:no-info=1 -crf $set_crf -map 0:0 -map $set_audio -map $set_audio1 -map 0:s -c:a aac -b:a 96k -metadata title=\"Encoded By Ani Animesh\" -metadata:s:0 title=\"Presented By Sakura Anime\" -metadata:s:a:0 title=\"Ani Animesh\" -metadata:s:a:1 title=\"Sakura Anime\" -metadata:s:s:0 title=\"Sakura Anime\" -metadata:s:s:1 title=\"@Animesh20\" -metadata:s:s:2 title=\"@AnimeChannelSakura\"  \"$output_folder/{filename.rpartition('.')[0]}.$output_file_type\""
+      ],
+      "metadata": {
+        "cellView": "form",
+        "id": "ziK4GsKNDN9G"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#@markdown <h3><b>FFMPEG Encode x264 10bit :</h3>\n",
+        "\n",
+        "import os, sys, re\n",
+        "\n",
+        "input_folder= '' #@param {type:\"string\"}\n",
+        "output_folder= '' #@param {type:\"string\"}\n",
+        "#@markdown <h3><b>Choose your encode setting :</h5>\n",
+        "#@markdown <h><i>main = default | main10 = HEVC 10 Bit</i>\n",
+        "encode_setting = \"X264 AAC 720p\" #@param [\"X264 AAC 720p\", \"X264 AAC 1080p\"]\n",
+        "output_file_type = 'mkv' #@param [\"mkv\", \"mp4\"]\n",
+        "#@markdown <h3><b>Video quality :</h3>\n",
+        "#@markdown <h><i>0 (Best) to 51 (Worst)</i><h>\n",
+        "set_crf ='22.2'#@param {type:\"string\"}\n",
+        "set_audio ='0:1' #@param {type:\"string\"}\n",
+        "\n",
+        "set_audio1 ='0:2' #@param {type:\"string\"}\n",
+        "my_suffixes = (\".mp4\", \".mov\", \".mkv\", \".avi\", \".ts\", \".flv\", \".webm\", \".wmv\", \".mpg\", \".m4v\", \".f4v\", \".m2ts\", \".mpeg\", \".3gp\", \".MP4\", \".MOV\", \".MKV\", \".AVI\", \".TS\", \".FLV\", \".WEBM\", \".WMV\", \".MPG\", \".M4V\", \".F4V\", \".M2TS\", \".MPEG\", \".3GP\")\n",
+        "\n",
+        "from pathlib import Path\n",
+        "Path(output_folder).mkdir(parents=True, exist_ok=True)\n",
+        "\n",
+        "if encode_setting == 'X264 AAC 720p':\n",
+        " for filename in os.listdir(input_folder):\n",
+        "     if (filename.endswith(my_suffixes)):\n",
+        "             cmd = !ffmpeg -stats  -i \"$input_folder/{filename}\" -metadata comment=\"X265-CRF$set_crf-opus\" -c:v libx264 -color_primaries 1 -color_range 1 -color_trc 1 -colorspace 1 -profile:v high10 -pix_fmt yuv420p10le -level:v 4.2 -vf scale=1280:720,\"drawtext=fontfile=/content/drive/MyDrive/Font/A.ttf:text=Encoded By @Ani_Animesh:x=1040:y=650:fontsize=20:fontcolor=white:enable=between(t\\,220\\,500)\",\"drawtext=fontfile=/content/drive/MyDrive/Font/cream-DEMO.ttf:text=www.AnimeSakura.co:fontsize=20:fontcolor=white:x=1040:y=650:enable=between(t\\,720\\,750)\" -preset slower  -tune animation -x264-params me=umh:ref=6:deblock=1,1,1:subme=7:psy=1:psy_rd=0.40:me_range=16:chroma_me=1:trellis=2:fast_pskip=1:chroma_qp_offset=-2:threads=18:lookahead_threads=4:sliced_threads=0:nr=0:interlaced=0:bluray_compat=0:constrained_intra=0:bframes=5:b_pyramid=2:b_adapt=2:b_bias=0:direct=1:weightb=1:open_gop=0:scenecut=40:intra_refresh=0:rc_lookahead=40:qcomp=0.60:qpmin=10:qpmax=51:qpstep=4 -crf $set_crf -map 0:0 -map $set_audio -map $set_audio1 -map 0:s -c:a libopus -b:a 78k -metadata title=\"Encoded By Ani Animesh\" -metadata:s:0 title=\"Presented By Anime Sakura\" -metadata:s:a:0 title=\"Ani Animesh\" -metadata:s:a:1 title=\"AnimeSakura.co\" -metadata:s:s:0 title=\"Anime Sakura\" -metadata:s:s:1 title=\"@Ani_Animesh\"  \"$output_folder/{filename.rpartition('.')[0]}.$output_file_type\"\n",
+        "if encode_setting == 'X264 AAC 1080p':\n",
+        " for filename in os.listdir(input_folder):\n",
+        "     if (filename.endswith(my_suffixes)):\n",
+        "             cmd = !ffmpeg -stats -i \"$input_folder/{filename}\" -metadata comment=\"X265-CRF$set_crf-AAC\" -c:v libx264 -color_primaries 1 -color_range 1 -color_trc 1 -colorspace 1 -profile:v high10 -pix_fmt yuv420p10le -level:v 5.2 -vf scale=1920:1080,\"drawtext=fontfile=/content/drive/MyDrive/Font/A.ttf:text=Encoded By @Ani_Animesh:x=1680:y=980:fontsize=20:fontcolor=white:enable=between(t\\,220\\,500)\",\"drawtext=fontfile=/content/drive/MyDrive/Font/cream-DEMO.ttf:text=www.AnimeSakura.co:fontsize=25:fontcolor=white:x=1680:y=980:enable=between(t\\,720\\,750)\" -preset medium  -tune animation -x264-params me=umh:ref=6:deblock=1,1,1:subme=7:psy=1:psy_rd=0.40:me_range=16:chroma_me=1:trellis=2:fast_pskip=1:chroma_qp_offset=-2:threads=18:lookahead_threads=4:sliced_threads=0:nr=0:interlaced=0:bluray_compat=0:constrained_intra=0:bframes=5:b_pyramid=2:b_adapt=2:b_bias=0:direct=1:weightb=1:open_gop=0:scenecut=40:intra_refresh=0:rc_lookahead=40:qcomp=0.60:qpmin=10:qpmax=51:qpstep=4 -crf $set_crf -map 0:0 -map $set_audio -map $set_audio1 -map 0:s -c:a aac -b:a 128k -metadata title=\"Encoded By Ani Animesh\" -metadata:s:0 title=\"Presented By Anime Sakura\" -metadata:s:a:0 title=\"Ani Animesh\" -metadata:s:a:1 title=\"AnimeSakura.co\" -metadata:s:s:0 title=\"Anime Sakura\" -metadata:s:s:1 title=\"@Ani_Animesh\" \"$output_folder/{filename.rpartition('.')[0]}.$output_file_type\""
+      ],
+      "metadata": {
+        "cellView": "form",
+        "id": "_u9l-SC_Dcmi"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import os, sys, re\n",
+        "\n",
+        "video_file_path = \"\" #@param {type:\"string\"}\n",
+        "output_file_extension = 'm4a' #@param [\"m4a\", \"aac\", \"opus\", \"flac\", \"wav\"]\n",
+        "\n",
+        "delsplit = re.search(\"\\/(?:.(?!\\/))+$\", video_file_path)\n",
+        "output_file_path = re.search(\"^[\\/].+\\/\", video_file_path)\n",
+        "filename = re.sub(\"^[\\/]\", \"\", delsplit.group(0))\n",
+        "filename_raw = re.sub(\".{4}$\", \"\", filename)\n",
+        "\n",
+        "os.environ['inputFile'] = video_file_path\n",
+        "os.environ['outputPath'] = output_file_path.group(0)\n",
+        "os.environ['fileName'] = filename_raw\n",
+        "os.environ['fileType'] = output_file_extension\n",
+        "\n",
+        "!ffmpeg -hide_banner -i \"$inputFile\" -vn -c:a copy \"$outputPath\"/\"$fileName\"-audio.\"$fileType\""
+      ],
+      "metadata": {
+        "cellView": "form",
+        "id": "cVu6mjUM-AZE"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import os, sys, re\n",
+        "\n",
+        "video_file_path = \"\" #@param {type:\"string\"}\n",
+        "audio_file_path = \"\" #@param {type:\"string\"}\n",
+        "\n",
+        "output_file_path = re.search(\"^[\\/].+\\/\", video_file_path)\n",
+        "output_file_path_raw = output_file_path.group(0)\n",
+        "delsplit = re.search(\"\\/(?:.(?!\\/))+$\", video_file_path)\n",
+        "filename = re.sub(\"^[\\/]\", \"\", delsplit.group(0))\n",
+        "filename_raw = re.sub(\".{4}$\", \"\", filename)\n",
+        "file_extension = re.search(\".{3}$\", filename)\n",
+        "file_extension_raw = file_extension.group(0)\n",
+        "\n",
+        "os.environ['inputFile'] = video_file_path\n",
+        "os.environ['inputAudioFile'] = audio_file_path\n",
+        "os.environ['outputPath'] = output_file_path_raw\n",
+        "os.environ['fileName'] = filename_raw\n",
+        "os.environ['fileExtension'] = file_extension_raw\n",
+        "\n",
+        "!ffmpeg -hide_banner -i \"$inputFile\" -i \"$inputAudioFile\" -c:v copy -map 0:0 -map 1 -map 0:a -map 0:s -c:a aac -b:a 128k -disposition:a:0 default -metadata:s:a:0 language=\"eng\" \"$outputPath\"/\"$fileName\"-out.mkv"
+      ],
+      "metadata": {
+        "cellView": "form",
+        "id": "QrO7DSIL-EJl"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#@title <font size=\"3\"> *You can ignore the* `At least one output file must be specified` *error for this cell*\n",
+        "import os, sys, re\n",
+        "media_file_path = \"\" #@param {type:\"string\"}\n",
+        "os.environ['inputFile'] = media_file_path\n",
+        "!ffmpeg -i \"$inputFile\" -hide_banner"
+      ],
+      "metadata": {
+        "cellView": "form",
+        "id": "K1yI6UXJsxY-"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
